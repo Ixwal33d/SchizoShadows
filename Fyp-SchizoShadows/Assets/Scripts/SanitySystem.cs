@@ -1,17 +1,28 @@
 using UnityEngine;
 
-public class ChangeSanitySystem : MonoBehaviour
+public class SanitySystem : MonoBehaviour
 {
     public float sanity = 100f;
+    public float minSanity = 0f;
     public float maxSanity = 100f;
 
-    public void ChangeSanity(float amount)
+    // ---------------------------
+    //  METHOD TO DECREASE SANITY
+    // ---------------------------
+    public void DecreaseSanity(float amount)
     {
-        sanity = Mathf.Clamp(sanity + amount, 0, maxSanity);
+        sanity -= amount;
+        sanity = Mathf.Clamp(sanity, minSanity, maxSanity);
+        Debug.Log("Sanity decreased. Current sanity: " + sanity);
     }
 
-    public bool IsLowSanity()
+    // ---------------------------
+    //  METHOD TO INCREASE SANITY
+    // ---------------------------
+    public void IncreaseSanity(float amount)
     {
-        return sanity < 40f;
+        sanity += amount;
+        sanity = Mathf.Clamp(sanity, minSanity, maxSanity);
+        Debug.Log("Sanity increased. Current sanity: " + sanity);
     }
 }

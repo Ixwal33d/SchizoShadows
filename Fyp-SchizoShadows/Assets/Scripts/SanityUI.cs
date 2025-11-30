@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class SanityUI : MonoBehaviour
 {
-    public SanitySystem sanitySystem;
+    public SanityManager sanitySystem;
     public Slider sanitySlider;
 
     void Update()

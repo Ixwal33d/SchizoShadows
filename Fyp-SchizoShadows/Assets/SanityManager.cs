@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SanitySystem : MonoBehaviour
+public class SanityManager : MonoBehaviour
 {
     [Header("Sanity Settings")]
     public float maxSanity = 100f;
