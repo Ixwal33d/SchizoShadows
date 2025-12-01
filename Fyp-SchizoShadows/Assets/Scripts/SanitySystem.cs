@@ -1,28 +1,29 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SanitySystem : MonoBehaviour
 {
-    public float sanity = 100f;
-    public float minSanity = 0f;
     public float maxSanity = 100f;
+    public float currentSanity;
 
-    // ---------------------------
-    //  METHOD TO DECREASE SANITY
-    // ---------------------------
-    public void DecreaseSanity(float amount)
+    void Start()
     {
-        sanity -= amount;
-        sanity = Mathf.Clamp(sanity, minSanity, maxSanity);
-        Debug.Log("Sanity decreased. Current sanity: " + sanity);
+        currentSanity = maxSanity;
     }
 
-    // ---------------------------
-    //  METHOD TO INCREASE SANITY
-    // ---------------------------
+    public void DecreaseSanity(float amount)
+    {
+        currentSanity -= amount;
+        currentSanity = Mathf.Clamp(currentSanity, 0, maxSanity);
+    }
+
     public void IncreaseSanity(float amount)
     {
-        sanity += amount;
-        sanity = Mathf.Clamp(sanity, minSanity, maxSanity);
-        Debug.Log("Sanity increased. Current sanity: " + sanity);
+        currentSanity += amount;
+        currentSanity = Mathf.Clamp(currentSanity, 0, maxSanity);
+    }
+
+    public float GetSanityPercent()
+    {
+        return currentSanity / maxSanity;
     }
 }

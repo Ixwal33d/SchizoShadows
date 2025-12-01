@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class SanityUI : MonoBehaviour
 {
-    public SanityManager sanitySystem;
+    public SanitySystem sanitySystem;
     public Slider sanitySlider;
 
     void Update()
@@ -14,4 +14,3 @@ public class SanityUI : MonoBehaviour
         }
     }
 }
-
