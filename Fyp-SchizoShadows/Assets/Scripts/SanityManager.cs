@@ -5,31 +5,24 @@ public class SanityManager : MonoBehaviour
     [Header("Sanity Settings")]
     public float maxSanity = 100f;
     public float currentSanity;
-    public float sanityDrainRate = 2f;   // sanity lost per second
-
-    [Header("Player Reference (Camera)")]
-    public Transform playerCamera;  // drag Main Camera here
 
     void Start()
     {
         currentSanity = maxSanity;
-
-        // Auto-find camera if not assigned
-        if (playerCamera == null)
-        {
-            playerCamera = Camera.main.transform;
-        }
     }
 
-    void Update()
+    public void DecreaseSanity(float amount)
     {
-        DrainSanityOverTime();
-    }
-
-    void DrainSanityOverTime()
-    {
-        currentSanity -= sanityDrainRate * Time.deltaTime;
+        currentSanity -= amount * Time.deltaTime;
         currentSanity = Mathf.Clamp(currentSanity, 0, maxSanity);
+        Debug.Log("Sanity Decreasing: " + currentSanity);
+    }
+
+    public void IncreaseSanity(float amount)
+    {
+        currentSanity += amount * Time.deltaTime;
+        currentSanity = Mathf.Clamp(currentSanity, 0, maxSanity);
+        Debug.Log("Sanity Increasing: " + currentSanity);
     }
 
     public float GetSanityPercent()

@@ -3,14 +3,17 @@ using UnityEngine.UI;
 
 public class SanityUI : MonoBehaviour
 {
-    public SanitySystem sanitySystem;
+    public SanityManager sanitySystem;
     public Slider sanitySlider;
+
+    void Start()
+    {
+        sanitySlider.minValue = 0f;
+        sanitySlider.maxValue = 1f;
+    }
 
     void Update()
     {
-        if (sanitySystem != null)
-        {
-            sanitySlider.value = sanitySystem.GetSanityPercent();
-        }
+        sanitySlider.value = sanitySystem.GetSanityPercent();
     }
 }
