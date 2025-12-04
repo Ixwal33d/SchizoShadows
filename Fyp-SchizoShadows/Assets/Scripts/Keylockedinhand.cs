@@ -88,22 +88,16 @@ public class KeyLockedInHand : MonoBehaviour
 
         if (isLockedInHand)
         {
-            // Check if player is near a door
-            if (IsNearDoor())
-            {
-                // Allow release - player is at a door
-                Debug.Log("✓ Key released near door - can unlock!");
-                isLockedInHand = false;
-                // Key will naturally drop/release here
-            }
-            else
-            {
-                // Prevent release - re-grab the key immediately!
-                Debug.Log("⚠️ Cannot drop key yet! You must use it on a door first.");
+            // Key is still locked - player hasn't unlocked a door yet
+            Debug.Log("⚠️ Cannot drop key! Find the locked door first.");
 
-                // Force re-grab after a tiny delay
-                Invoke(nameof(ForceReGrab), 0.05f);
-            }
+            // Force re-grab
+            Invoke(nameof(ForceReGrab), 0.05f);
+        }
+        else
+        {
+            // Key is unlocked - door was already opened
+            Debug.Log("✓ Key released - door is already open!");
         }
     }
 
@@ -134,7 +128,45 @@ public class KeyLockedInHand : MonoBehaviour
         // Check for nearby doors while key is held
         if (isLockedInHand && hasBeenPickedUp)
         {
-            FindNearestDoor();
+            CheckAndUnlockNearbyDoor();
+        }
+    }
+
+    void CheckAndUnlockNearbyDoor()
+    {
+        // Find all doors
+        GameObject[] doors = GameObject.FindGameObjectsWithTag(doorTag);
+
+        foreach (GameObject doorObj in doors)
+        {
+            float distance = Vector3.Distance(transform.position, doorObj.transform.position);
+
+            // If player is close to a door
+            if (distance < unlockDistance)
+            {
+                LockedDoor doorScript = doorObj.GetComponent<LockedDoor>();
+
+                if (doorScript != null && doorScript.IsLocked())
+                {
+                    // Check if this key matches the door
+                    if (doorScript.GetRequiredKeyID() == keyID)
+                    {
+                        // ✅ CORRECT KEY! Auto-unlock!
+                        Debug.Log($"✅ {keyID} is near the correct door! Auto-unlocking...");
+                        doorScript.UnlockDoorWithKey();
+
+                        // Unlock key from hand
+                        isLockedInHand = false;
+                        Debug.Log("🔓 Key unlocked from hand!");
+                        return;
+                    }
+                    else
+                    {
+                        // Wrong key for this door
+                        Debug.Log($"❌ Wrong key! This door needs: {doorScript.GetRequiredKeyID()}");
+                    }
+                }
+            }
         }
     }
 
@@ -206,6 +238,18 @@ public class KeyLockedInHand : MonoBehaviour
     public void UnlockKey()
     {
         LockInHand(false);
+    }
+
+    // Alternative method name for compatibility
+    public void UnlockFromHand()
+    {
+        LockInHand(false);
+    }
+
+    // Get the key ID
+    public string GetKeyID()
+    {
+        return keyID;
     }
 
     // Check if key is locked in hand
