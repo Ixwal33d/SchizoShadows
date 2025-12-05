@@ -271,6 +271,21 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Door
       objectReference: {fileID: 0}
+    - target: {fileID: 7924463537406566829, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
+        type: 3}
+      propertyPath: m_FirstSelectEntered.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 16487506}
+    - target: {fileID: 7924463537406566829, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
+        type: 3}
+      propertyPath: m_FirstSelectEntered.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: TryOpenSimpleDoor
+      objectReference: {fileID: 0}
+    - target: {fileID: 7924463537406566829, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
+        type: 3}
+      propertyPath: m_FirstSelectEntered.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: LockedDoor, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 8362761294343387571, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -348,8 +363,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 699f95fc68645244a96653154aad454d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  requiredKeyID: MainKey
-  isLocked: 1
+  requiredKeyID: no
+  isLocked: 0
   unlockDistance: 2
   rotateToOpen: 1
   openAngle: 90
@@ -1439,49 +1454,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 1465276155610947216, guid: c1a1db9ba5d39a94c9952b68f2ca24cc, type: 3}
---- !u!1 &133210184 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1812505671824344696, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
-    type: 3}
-  m_PrefabInstance: {fileID: 257682170}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &133210190
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 133210184}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 699f95fc68645244a96653154aad454d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  requiredKeyID: MainKey
-  isLocked: 1
-  unlockDistance: 0
-  rotateToOpen: 1
-  openAngle: 90
-  openSpeed: 2
-  rotationAxis: {x: 0, y: 1, z: 0}
-  unlockSound: {fileID: 0}
-  openSound: {fileID: 0}
-  lockedSound: {fileID: 0}
---- !u!114 &133210191
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 133210184}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e61115bfa31aae846815c170ccf7e314, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  openAngle: -90
-  openSpeed: 1
-  requiresKey: 1
 --- !u!1 &133388003 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7293164784186840050, guid: c1a1db9ba5d39a94c9952b68f2ca24cc,
@@ -1918,6 +1890,21 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Door
       objectReference: {fileID: 0}
+    - target: {fileID: 7924463537406566829, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
+        type: 3}
+      propertyPath: m_FirstSelectEntered.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 202238427}
+    - target: {fileID: 7924463537406566829, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
+        type: 3}
+      propertyPath: m_FirstSelectEntered.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: TryOpenSimpleDoor
+      objectReference: {fileID: 0}
+    - target: {fileID: 7924463537406566829, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
+        type: 3}
+      propertyPath: m_FirstSelectEntered.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: LockedDoor, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 8362761294343387571, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1995,8 +1982,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 699f95fc68645244a96653154aad454d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  requiredKeyID: MainKey
-  isLocked: 1
+  requiredKeyID: no
+  isLocked: 0
   unlockDistance: 2
   rotateToOpen: 1
   openAngle: 90
@@ -2285,9 +2272,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bace5deb031054469a22d0d2e902486, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  keyID: MainKey
+  keyID: FakeKey5
   pickupSound: {fileID: 8300000, guid: ada5c8dc0f5d4bb4b06205bd88ad9e90, type: 3}
-  lockInHandWhenGrabbed: 1
   doorTag: Door
   unlockDistance: 2
 --- !u!114 &233848333
@@ -2697,6 +2683,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_FirstSelectEntered.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
+      objectReference: {fileID: 257682173}
+    - target: {fileID: 7924463537406566829, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
+        type: 3}
+      propertyPath: m_FirstSelectEntered.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: TryOpenSimpleDoor
+      objectReference: {fileID: 0}
+    - target: {fileID: 7924463537406566829, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
+        type: 3}
+      propertyPath: m_FirstSelectEntered.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: LockedDoor, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 8362761294343387571, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
         type: 3}
@@ -2748,20 +2744,62 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 7494221740899727965, guid: 3ee55adbc49b7b4419b15513d6f2b54b, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1812505671824344696, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
+    - targetCorrespondingSourceObject: {fileID: 383364894923779391, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 133210191}
-    - targetCorrespondingSourceObject: {fileID: 1812505671824344696, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
+      addedObject: {fileID: 257682173}
+    - targetCorrespondingSourceObject: {fileID: 383364894923779391, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 133210190}
+      addedObject: {fileID: 257682172}
   m_SourcePrefab: {fileID: 100100000, guid: 3ee55adbc49b7b4419b15513d6f2b54b, type: 3}
+--- !u!1 &257682171 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 383364894923779391, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
+    type: 3}
+  m_PrefabInstance: {fileID: 257682170}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &257682172
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 257682171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e61115bfa31aae846815c170ccf7e314, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  openAngle: -90
+  openSpeed: 2
+  requiresKey: 0
+--- !u!114 &257682173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 257682171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 699f95fc68645244a96653154aad454d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  requiredKeyID: no
+  isLocked: 0
+  unlockDistance: 2
+  rotateToOpen: 1
+  openAngle: 90
+  openSpeed: 2
+  rotationAxis: {x: 0, y: 1, z: 0}
+  unlockSound: {fileID: 0}
+  openSound: {fileID: 0}
+  lockedSound: {fileID: 0}
 --- !u!1 &263543243 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -1213251168862655140, guid: c1a1db9ba5d39a94c9952b68f2ca24cc,
@@ -3629,6 +3667,21 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Door
       objectReference: {fileID: 0}
+    - target: {fileID: 7924463537406566829, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
+        type: 3}
+      propertyPath: m_FirstSelectEntered.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 399205334}
+    - target: {fileID: 7924463537406566829, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
+        type: 3}
+      propertyPath: m_FirstSelectEntered.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: TryOpenSimpleDoor
+      objectReference: {fileID: 0}
+    - target: {fileID: 7924463537406566829, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
+        type: 3}
+      propertyPath: m_FirstSelectEntered.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: LockedDoor, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 8362761294343387571, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3706,8 +3759,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 699f95fc68645244a96653154aad454d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  requiredKeyID: MainKey
-  isLocked: 1
+  requiredKeyID: no
+  isLocked: 0
   unlockDistance: 2
   rotateToOpen: 1
   openAngle: 90
@@ -11721,7 +11774,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   keyID: MainKey
   pickupSound: {fileID: 8300000, guid: ada5c8dc0f5d4bb4b06205bd88ad9e90, type: 3}
-  lockInHandWhenGrabbed: 1
   doorTag: Door
   unlockDistance: 2
 --- !u!1001 &717184449
@@ -12527,9 +12579,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bace5deb031054469a22d0d2e902486, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  keyID: MainKey
+  keyID: FakeKey2
   pickupSound: {fileID: 8300000, guid: ada5c8dc0f5d4bb4b06205bd88ad9e90, type: 3}
-  lockInHandWhenGrabbed: 1
   doorTag: Door
   unlockDistance: 2
 --- !u!114 &794911057
@@ -15160,9 +15211,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bace5deb031054469a22d0d2e902486, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  keyID: MainKey
+  keyID: FakeKey3
   pickupSound: {fileID: 8300000, guid: ada5c8dc0f5d4bb4b06205bd88ad9e90, type: 3}
-  lockInHandWhenGrabbed: 1
   doorTag: Door
   unlockDistance: 2
 --- !u!114 &1011549034
@@ -17719,6 +17769,21 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Door
       objectReference: {fileID: 0}
+    - target: {fileID: 7924463537406566829, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
+        type: 3}
+      propertyPath: m_FirstSelectEntered.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1117677670}
+    - target: {fileID: 7924463537406566829, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
+        type: 3}
+      propertyPath: m_FirstSelectEntered.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: TryOpenSimpleDoor
+      objectReference: {fileID: 0}
+    - target: {fileID: 7924463537406566829, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
+        type: 3}
+      propertyPath: m_FirstSelectEntered.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: LockedDoor, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 8362761294343387571, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -18246,9 +18311,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bace5deb031054469a22d0d2e902486, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  keyID: MainKey
+  keyID: FakeKey4
   pickupSound: {fileID: 8300000, guid: ada5c8dc0f5d4bb4b06205bd88ad9e90, type: 3}
-  lockInHandWhenGrabbed: 1
   doorTag: Door
   unlockDistance: 2
 --- !u!114 &1150202340
@@ -25930,9 +25994,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bace5deb031054469a22d0d2e902486, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  keyID: MainKey
+  keyID: FakeKey1
   pickupSound: {fileID: 8300000, guid: ada5c8dc0f5d4bb4b06205bd88ad9e90, type: 3}
-  lockInHandWhenGrabbed: 1
   doorTag: Door
   unlockDistance: 2
 --- !u!114 &1375616380
@@ -28535,6 +28598,21 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Door
       objectReference: {fileID: 0}
+    - target: {fileID: 7924463537406566829, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
+        type: 3}
+      propertyPath: m_FirstSelectEntered.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1698271346}
+    - target: {fileID: 7924463537406566829, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
+        type: 3}
+      propertyPath: m_FirstSelectEntered.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: TryOpenSimpleDoor
+      objectReference: {fileID: 0}
+    - target: {fileID: 7924463537406566829, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
+        type: 3}
+      propertyPath: m_FirstSelectEntered.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: LockedDoor, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 8362761294343387571, guid: 3ee55adbc49b7b4419b15513d6f2b54b,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -28612,10 +28690,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 699f95fc68645244a96653154aad454d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  requiredKeyID: MainKey
-  isLocked: 1
+  requiredKeyID: no
+  isLocked: 0
   unlockDistance: 2
-  rotateToOpen: 1
+  rotateToOpen: 0
   openAngle: 90
   openSpeed: 2
   rotationAxis: {x: 0, y: 1, z: 0}

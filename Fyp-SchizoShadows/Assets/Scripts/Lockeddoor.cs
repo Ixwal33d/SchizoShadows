@@ -2,13 +2,14 @@
 
 public class LockedDoor : MonoBehaviour
 {
+    // These fields are crucial for Inspector setup and KeyLockedInHand to function
     [Header("Door Settings")]
     [SerializeField] private string requiredKeyID = "MainKey";
     [SerializeField] private bool isLocked = true;
-    [SerializeField] private float unlockDistance = 2f;
+    [SerializeField] private float unlockDistance = 2f; 
 
     [Header("Door Animation")]
-    [SerializeField] private bool rotateToOpen = true;
+    [SerializeField] private bool rotateToOpen = true; 
     [SerializeField] private float openAngle = 90f;
     [SerializeField] private float openSpeed = 2f;
     [SerializeField] private Vector3 rotationAxis = Vector3.up;
@@ -16,7 +17,7 @@ public class LockedDoor : MonoBehaviour
     [Header("Audio")]
     [SerializeField] private AudioClip unlockSound;
     [SerializeField] private AudioClip openSound;
-    [SerializeField] private AudioClip lockedSound;
+    [SerializeField] private AudioClip lockedSound; // Used when the wrong key is tried
 
     private bool isOpening = false;
     private bool isOpen = false;
@@ -26,29 +27,17 @@ public class LockedDoor : MonoBehaviour
 
     void Start()
     {
-        // Store rotations
         closedRotation = transform.rotation;
         openRotation = closedRotation * Quaternion.Euler(rotationAxis * openAngle);
 
-        // Setup audio
+        // Setup audio source
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.playOnAwake = false;
         audioSource.spatialBlend = 1f;
 
-        // Add Door tag if missing
         if (!gameObject.CompareTag("Door"))
         {
             gameObject.tag = "Door";
-            Debug.Log("✓ Added 'Door' tag to " + gameObject.name);
-        }
-
-        if (isLocked)
-        {
-            Debug.Log($"🔒 Door '{gameObject.name}' is LOCKED!");
-        }
-        else
-        {
-            Debug.Log($"✓ Door '{gameObject.name}' is UNLOCKED");
         }
     }
 
@@ -57,36 +46,40 @@ public class LockedDoor : MonoBehaviour
         // Animate door opening
         if (isOpening && !isOpen)
         {
-            transform.rotation = Quaternion.Lerp(transform.rotation, openRotation, Time.deltaTime * openSpeed);
+            Quaternion targetRotation = openRotation;
+            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * openSpeed);
 
             if (Quaternion.Angle(transform.rotation, openRotation) < 1f)
             {
                 transform.rotation = openRotation;
                 isOpening = false;
                 isOpen = true;
-                Debug.Log($"✅ Door '{gameObject.name}' is now fully OPEN!");
             }
         }
     }
 
-    // Called by KeyLockedInHand when player uses the key
+    // Called by KeyLockedInHand when player uses the correct key
     public void UnlockDoorWithKey()
+    {
+        if (!isLocked) return;
+
+        isLocked = false;
+        PlaySound(unlockSound);
+        Invoke(nameof(OpenDoor), 0.5f); 
+    }
+    
+    // For the 6 simple doors: Opens if unlocked, plays locked sound if locked.
+    // Must be linked to the XR Interactable event.
+    public void TryOpenSimpleDoor()
     {
         if (!isLocked)
         {
-            Debug.Log("💡 This door is already unlocked!");
-            return;
+            OpenDoor();
         }
-
-        isLocked = false;
-
-        Debug.Log($"🔓 Door '{gameObject.name}' UNLOCKED with key!");
-
-        // Play unlock sound
-        PlaySound(unlockSound);
-
-        // Open the door after short delay
-        Invoke(nameof(OpenDoor), 0.5f);
+        else
+        {
+            PlayLockedSound();
+        }
     }
 
     void OpenDoor()
@@ -95,8 +88,13 @@ public class LockedDoor : MonoBehaviour
         {
             isOpening = true;
             PlaySound(openSound);
-            Debug.Log($"🚪 Opening door '{gameObject.name}'...");
         }
+    }
+
+    // This method is called by KeyLockedInHand when the key is wrong
+    public void PlayLockedSound()
+    {
+        PlaySound(lockedSound);
     }
 
     void PlaySound(AudioClip clip)
@@ -108,7 +106,7 @@ public class LockedDoor : MonoBehaviour
         }
     }
 
-    // Public methods
+    // Public accessors required by KeyLockedInHand.cs
     public bool IsLocked()
     {
         return isLocked;
@@ -118,7 +116,7 @@ public class LockedDoor : MonoBehaviour
     {
         return requiredKeyID;
     }
-
+    
     public void SetLocked(bool locked)
     {
         isLocked = locked;

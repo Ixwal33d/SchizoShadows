@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8362761294343387571}
-  - component: {fileID: 7494221740899727965}
   m_Layer: 0
   m_Name: 'DoorPivot '
   m_TagString: Untagged
@@ -33,21 +32,6 @@ Transform:
   - {fileID: 6629718299618341093}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7494221740899727965
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 383364894923779391}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e61115bfa31aae846815c170ccf7e314, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  openAngle: -90
-  openSpeed: 1
-  requiresKey: 0
 --- !u!1 &1812505671824344696
 GameObject:
   m_ObjectHideFlags: 0
@@ -199,7 +183,7 @@ MonoBehaviour:
   m_FirstSelectEntered:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7494221740899727965}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SimpleDoor, Assembly-CSharp
         m_MethodName: ToggleDoor
         m_Mode: 1
@@ -214,7 +198,7 @@ MonoBehaviour:
   m_LastSelectExited:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7494221740899727965}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SimpleDoor, Assembly-CSharp
         m_MethodName: ToggleDoor
         m_Mode: 1
