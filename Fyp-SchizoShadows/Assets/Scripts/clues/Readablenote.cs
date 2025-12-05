@@ -10,10 +10,10 @@ public class ReadableNote : MonoBehaviour
 {
     [Header("Note Content")]
     [TextArea(3, 10)]
-    [SerializeField] private string noteTitle = "Mysterious Note";
+    [SerializeField] private string noteTitle = "Torn Diary Page";
 
     [TextArea(5, 20)]
-    [SerializeField] private string noteText = "Enter your clue text here...";
+    [SerializeField] private string noteText = "The master always hides his important keys in cold places. Check the icebox...no, wait, the bathroom? I can't remember.";
 
     [Header("Visual Settings")]
     [SerializeField] private Color noteColor = Color.white;
