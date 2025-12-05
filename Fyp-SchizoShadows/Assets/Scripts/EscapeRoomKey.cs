@@ -2,17 +2,13 @@ using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using System.Collections;
 
-/// <summary>
-/// Escape Room Key for SimpleDoorVR
-/// Locks in hand until used on door
-/// </summary>
 [RequireComponent(typeof(XRGrabInteractable))]
 public class EscapeRoomKey : MonoBehaviour
 {
     [Header("Key Identity")]
-    [SerializeField] private string keyID = "Key_1";
+    [Tooltip("Must match the door's Required Key ID to unlock it.")]
+    [SerializeField] private string keyID = "MasterKey";
     [SerializeField] private string keyName = "Old Key";
-    [SerializeField] private bool isCorrectKey = false;
     
     [Header("Visual")]
     [SerializeField] private Color keyColor = Color.gray;
@@ -22,7 +18,7 @@ public class EscapeRoomKey : MonoBehaviour
     [SerializeField] private AudioClip wrongKeySound;
     
     [Header("Settings")]
-    [SerializeField] private bool lockInHand = true;
+    [Tooltip("The distance (in meters) the key must be from the door to attempt a check.")]
     [SerializeField] private float doorDetectDistance = 3f;
     
     private XRGrabInteractable grabInteractable;
@@ -36,11 +32,6 @@ public class EscapeRoomKey : MonoBehaviour
         Debug.Log($"🔑 Key '{keyName}' initializing...");
         
         grabInteractable = GetComponent<XRGrabInteractable>();
-        if (grabInteractable == null)
-        {
-            Debug.LogError($"❌ {keyName}: Missing XRGrabInteractable!");
-        }
-        
         keyRigidbody = GetComponent<Rigidbody>();
         
         audioSource = gameObject.AddComponent<AudioSource>();
@@ -52,8 +43,6 @@ public class EscapeRoomKey : MonoBehaviour
         {
             renderer.material.color = keyColor;
         }
-        
-        Debug.Log($"✅ {keyName} ready - IsCorrectKey: {isCorrectKey}");
     }
 
     void OnEnable()
@@ -76,53 +65,54 @@ public class EscapeRoomKey : MonoBehaviour
 
     void OnGrabbed(SelectEnterEventArgs args)
     {
-        Debug.Log($"✋ {keyName} GRABBED!");
+        Debug.Log($"✋ {keyName} GRABBED! KeyID: {keyID}");
         
         if (!hasBeenPickedUp)
         {
             hasBeenPickedUp = true;
-
-            if (keyRigidbody != null)
-            {
-                keyRigidbody.isKinematic = false;
-                keyRigidbody.constraints = RigidbodyConstraints.None;
-            }
-
-            if (pickupSound != null)
-            {
-                audioSource.PlayOneShot(pickupSound);
-            }
-
-            if (lockInHand)
-            {
-                isLockedInHand = true;
-                Debug.Log($"🔒 {keyName} LOCKED in hand!");
-            }
         }
+
+        if (keyRigidbody != null)
+        {
+            // Ensure key is non-kinematic to allow throwing/dropping
+            keyRigidbody.isKinematic = false;
+            keyRigidbody.constraints = RigidbodyConstraints.None;
+        }
+
+        if (pickupSound != null)
+        {
+            audioSource.PlayOneShot(pickupSound);
+        }
+
+        // Key is immediately locked in hand once grabbed
+        isLockedInHand = true; 
+        Debug.Log($"🔒 {keyName} LOCKED in hand!");
     }
     
     void OnReleased(SelectExitEventArgs args)
     {
+        // If the key is locked in hand, try to re-grab it immediately (to prevent dropping)
         if (isLockedInHand)
         {
-            Debug.Log($"⚠️ {keyName} is locked - attempting re-grab...");
-            Invoke("TryReGrab", 0.1f);
+            Invoke(nameof(TryReGrab), 0.1f);
         }
     }
     
     void TryReGrab()
     {
+        // Only attempt re-grab if the key is still locked in hand AND not currently selected by an interactor
         if (!grabInteractable.isSelected && isLockedInHand)
         {
+            // Find the closest interactor to re-grab the key
             XRBaseInteractor[] interactors = FindObjectsOfType<XRBaseInteractor>();
             
             foreach (var interactor in interactors)
             {
                 float distance = Vector3.Distance(interactor.transform.position, transform.position);
-                if (distance < 0.5f)
+                if (distance < 0.5f) // Close enough to be the original interactor
                 {
                     interactor.interactionManager.SelectEnter(interactor, grabInteractable);
-                    Debug.Log($"✅ {keyName} re-grabbed!");
+                    Debug.Log($"✅ {keyName} re-grabbed by interactor!");
                     return;
                 }
             }
@@ -131,7 +121,8 @@ public class EscapeRoomKey : MonoBehaviour
 
     void Update()
     {
-        if (isLockedInHand && hasBeenPickedUp && grabInteractable.isSelected)
+        // Only run the lock check if the key is currently held/selected by the player
+        if (isLockedInHand && grabInteractable.isSelected)
         {
             CheckNearbyLockedDoors();
         }
@@ -139,85 +130,81 @@ public class EscapeRoomKey : MonoBehaviour
 
     void CheckNearbyLockedDoors()
     {
+        // NOTE: We are now checking for SimpleDoor instead of LockedDoor
         SimpleDoor[] allDoors = FindObjectsOfType<SimpleDoor>();
         
         if (allDoors.Length == 0)
         {
-            Debug.LogWarning("⚠️ No SimpleDoorVR doors found in scene!");
+            Debug.LogWarning("⚠️ No SimpleDoor doors found in scene!");
             return;
         }
         
         foreach (SimpleDoor door in allDoors)
         {
+            // Check 1: Is the door locked?
             if (!door.IsLocked()) continue;
             
+            // Check 2: Is the key close enough?
             float distance = Vector3.Distance(transform.position, door.transform.position);
             
             if (distance < doorDetectDistance)
             {
-                Debug.Log($"💡 {keyName} near locked door! Distance: {distance:F2}m");
+                Debug.Log($"💡 {keyName} near locked door! Door Needs: {door.GetRequiredKeyID()}");
                 
-                if (isCorrectKey && keyID == door.GetRequiredKeyID())
+                // Check 3: Does the Key ID MATCH the Door ID? (Simplified logic)
+                if (keyID == door.GetRequiredKeyID())
                 {
                     Debug.Log($"✅ CORRECT KEY! {keyName} unlocks door!");
                     door.UnlockWithKey(keyID);
-                    isLockedInHand = false;
+                    isLockedInHand = false; // Key is no longer needed
                     ForceDropKey();
+                    Destroy(gameObject, 0.5f); // Destroy the key after use
+                    return;
                 }
                 else
                 {
-                    Debug.Log($"❌ WRONG KEY! {keyName} doesn't work!");
+                    Debug.Log($"❌ WRONG KEY! {keyName} doesn't work! Dropping key.");
                     if (wrongKeySound != null) audioSource.PlayOneShot(wrongKeySound);
-                    isLockedInHand = false;
+                    isLockedInHand = false; // Player is forced to drop the key
                     ForceDropKey();
+                    return;
                 }
-                
-                return;
             }
         }
     }
 
     void ForceDropKey()
     {
-        Debug.Log($"🔓 Dropping {keyName}...");
+        Debug.Log($"🔓 Forcing drop of {keyName}...");
         
         if (grabInteractable.isSelected)
         {
             var interactor = grabInteractable.firstInteractorSelecting as XRBaseInteractor;
             if (interactor != null)
             {
+                // Force the interactor to exit selection, releasing the key
                 interactor.interactionManager.SelectExit(interactor, grabInteractable);
                 Debug.Log($"✅ {keyName} dropped!");
-                return;
             }
         }
         
+        // This brief coroutine prevents the key from being immediately re-grabbed by the hand that just dropped it.
         StartCoroutine(TemporaryDisableGrab());
     }
     
     IEnumerator TemporaryDisableGrab()
     {
         var originalMask = grabInteractable.interactionLayers;
-        grabInteractable.interactionLayers = 0;
+        grabInteractable.interactionLayers = 0; // Disable interaction temporarily
         
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.5f); // Wait half a second
         
-        grabInteractable.interactionLayers = originalMask;
-        Debug.Log($"✅ {keyName} can be grabbed again!");
-    }
-
-    public bool IsCorrectKey()
-    {
-        return isCorrectKey;
+        grabInteractable.interactionLayers = originalMask; // Restore interaction
+        Debug.Log($"✅ {keyName} can be grabbed again (if it wasn't destroyed)!");
     }
 
     public string GetKeyID()
     {
         return keyID;
-    }
-    
-    public bool IsLockedInHand()
-    {
-        return isLockedInHand;
     }
 }
