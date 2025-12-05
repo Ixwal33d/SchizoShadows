@@ -28,7 +28,11 @@ public class LockedDoor : MonoBehaviour
     void Start()
     {
         closedRotation = transform.rotation;
-        openRotation = closedRotation * Quaternion.Euler(rotationAxis * openAngle);
+
+        // FIX: Apply the openAngle rotation *relative to the door's current rotation*
+        // This ensures it rotates along its own local Y-axis (the hinge line)
+        // We are ignoring the 'rotationAxis' field for simplicity, as doors usually rotate around Y.
+        openRotation = closedRotation * Quaternion.Euler(0, openAngle, 0);
 
         // Setup audio source
         audioSource = gameObject.AddComponent<AudioSource>();
@@ -40,7 +44,6 @@ public class LockedDoor : MonoBehaviour
             gameObject.tag = "Door";
         }
     }
-
     void Update()
     {
         // Animate door opening
