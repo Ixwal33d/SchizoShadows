@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
 /// <summary>
@@ -12,18 +12,18 @@ public class EscapeRoomKey : MonoBehaviour
     [SerializeField] private string keyID = "Key_1";
     [SerializeField] private string keyName = "Old Key";
     [SerializeField] private bool isCorrectKey = false; // ✅ Check ONLY for the ONE correct key
-    
+
     [Header("Visual")]
     [SerializeField] private Color keyColor = Color.gray;
-    
+
     [Header("Audio")]
     [SerializeField] private AudioClip pickupSound;
     [SerializeField] private AudioClip wrongKeySound;
-    
+
     [Header("Settings")]
     [SerializeField] private bool lockInHand = true; // Lock in hand until used on door?
     [SerializeField] private float doorDetectDistance = 3f;
-    
+
     private XRGrabInteractable grabInteractable;
     private SubtleGlowKey subtleGlowKey;
     private AudioSource audioSource;
@@ -36,11 +36,11 @@ public class EscapeRoomKey : MonoBehaviour
         grabInteractable = GetComponent<XRGrabInteractable>();
         subtleGlowKey = GetComponent<SubtleGlowKey>();
         keyRigidbody = GetComponent<Rigidbody>();
-        
+
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.playOnAwake = false;
         audioSource.spatialBlend = 1f;
-        
+
         // Set visual color
         Renderer renderer = GetComponent<Renderer>();
         if (renderer != null)
@@ -103,20 +103,20 @@ public class EscapeRoomKey : MonoBehaviour
     void CheckNearbyLockedDoors()
     {
         UniversalDoor[] allDoors = FindObjectsOfType<UniversalDoor>();
-        
+
         foreach (UniversalDoor door in allDoors)
         {
             // Only check locked doors
             if (!door.IsLocked()) continue;
-            
+
             float distance = Vector3.Distance(transform.position, door.transform.position);
-            
+
             // If near a locked door
             if (distance < doorDetectDistance)
             {
                 // Automatically try this key
                 Debug.Log($"💡 Near locked door! Auto-checking {keyName}...");
-                
+
                 if (isCorrectKey)
                 {
                     // ✅ CORRECT KEY!
@@ -125,9 +125,9 @@ public class EscapeRoomKey : MonoBehaviour
                     {
                         Debug.Log($"✅ SUCCESS! {keyName} is the CORRECT key!");
                         isLockedInHand = false; // Can drop now
-                        
-                        // Force drop the key after unlocking
-                        Invoke(nameof(ForceDropKey), 0.5f);
+
+                        // Force drop the key immediately
+                        ForceDropKeyNow();
                     }
                 }
                 else
@@ -135,28 +135,52 @@ public class EscapeRoomKey : MonoBehaviour
                     // ❌ WRONG KEY!
                     Debug.Log($"❌ WRONG! {keyName} doesn't work. Dropping key...");
                     if (wrongKeySound != null) audioSource.PlayOneShot(wrongKeySound);
-                    
+
                     // Automatically drop wrong key
                     isLockedInHand = false;
-                    Invoke(nameof(ForceDropKey), 0.3f);
+                    ForceDropKeyNow();
                 }
-                
+
                 return; // Only check one door at a time
             }
         }
     }
 
-    void ForceDropKey()
+    void ForceDropKeyNow()
     {
+        // Method 1: Try direct detach
         if (grabInteractable.isSelected)
         {
-            var interactor = grabInteractable.firstInteractorSelecting;
+            var interactor = grabInteractable.firstInteractorSelecting as UnityEngine.XR.Interaction.Toolkit.XRBaseInteractor;
             if (interactor != null)
             {
-                (interactor as XRBaseInteractor)?.interactionManager.SelectExit(interactor, grabInteractable);
-                Debug.Log($"🔓 {keyName} dropped from hand.");
+                interactor.interactionManager.SelectExit(interactor, grabInteractable);
+                Debug.Log($"🔓 {keyName} dropped from hand (Method 1).");
+                return;
             }
         }
+
+        // Method 2: Force interactionLayerMask to 0 (makes it un-grabbable temporarily)
+        StartCoroutine(TemporaryDisableGrab());
+    }
+
+    System.Collections.IEnumerator TemporaryDisableGrab()
+    {
+        // Store original layer mask
+        var originalMask = grabInteractable.interactionLayers;
+
+        // Disable grabbing
+        grabInteractable.interactionLayers = 0;
+
+        Debug.Log($"🔓 {keyName} grab disabled - forcing drop.");
+
+        // Wait a frame for physics
+        yield return new WaitForSeconds(0.1f);
+
+        // Re-enable grabbing after drop
+        grabInteractable.interactionLayers = originalMask;
+
+        Debug.Log($"✅ {keyName} can be grabbed again.");
     }
 
     public bool IsCorrectKey()
