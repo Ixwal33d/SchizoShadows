@@ -3,18 +3,18 @@
 public class SubtleGlowKey : MonoBehaviour
 {
     [Header("Subtle Glow Settings")]
-    [SerializeField] private Color glowColor = new Color(0.9f, 0.9f, 1f, 1f); // Soft white-blue
-    [SerializeField] private float baseEmissionIntensity = 0.3f; // Very subtle
-    [SerializeField] private float pulseIntensity = 0.5f; // Max intensity during pulse
-    [SerializeField] private float pulseSpeed = 1.5f; // Slow, subtle pulse
+    [SerializeField] private Color glowColor = new Color(0.9f, 0.9f, 1f, 1f);
+    [SerializeField] private float baseEmissionIntensity = 0.3f;
+    [SerializeField] private float pulseIntensity = 0.5f;
+    [SerializeField] private float pulseSpeed = 1.5f;
 
     [Header("Optional Light")]
-    [SerializeField] private bool addPointLight = false; // Usually not needed for subtle effect
+    [SerializeField] private bool addPointLight = false;
     [SerializeField] private float lightIntensity = 0.5f;
     [SerializeField] private float lightRange = 2f;
 
     [Header("Rotation (Optional)")]
-    [SerializeField] private bool rotateKey = false; // Usually off for realistic look
+    [SerializeField] private bool rotateKey = false;
     [SerializeField] private float rotationSpeed = 20f;
 
     private Material keyMaterial;
@@ -37,21 +37,12 @@ public class SubtleGlowKey : MonoBehaviour
 
         if (keyRenderer != null)
         {
-            // Create a new material instance
+            // Create a new material instance so we don't change the shared asset
             keyMaterial = new Material(keyRenderer.sharedMaterial);
             keyRenderer.material = keyMaterial;
 
-            // Enable emission
             keyMaterial.EnableKeyword("_EMISSION");
-
-            // Set initial subtle glow
             keyMaterial.SetColor("_EmissionColor", glowColor * baseEmissionIntensity);
-
-            Debug.Log("✓ Subtle glow effect applied to " + gameObject.name);
-        }
-        else
-        {
-            Debug.LogError("❌ No Renderer found on " + gameObject.name + "! Add a Mesh Renderer.");
         }
     }
 
@@ -71,7 +62,7 @@ public class SubtleGlowKey : MonoBehaviour
 
     void Update()
     {
-        // Very subtle pulsing effect
+        // Subtle pulsing effect
         float pulse = Mathf.Lerp(baseEmissionIntensity, pulseIntensity,
             (Mathf.Sin(Time.time * pulseSpeed) + 1f) / 2f);
 
@@ -92,7 +83,7 @@ public class SubtleGlowKey : MonoBehaviour
         }
     }
 
-    // Call this when key is picked up
+    // Called by EscapeRoomKey.cs on pickup
     public void DisableGlow()
     {
         if (keyMaterial != null)
@@ -103,12 +94,11 @@ public class SubtleGlowKey : MonoBehaviour
 
         if (pointLight != null)
         {
+            // Clean up the dynamically created light object
             Destroy(pointLight.gameObject);
         }
 
-        enabled = false;
+        enabled = false; // Stop the Update() loop from running
+        Debug.Log("Glow effect permanently disabled.");
     }
-
-    // Optional: Add outline shader effect for even more visibility
-    // This would require a separate outline shader
 }
