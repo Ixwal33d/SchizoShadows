@@ -15,7 +15,7 @@ TagManager:
   - UI
   - Post-process
   - Minimap
-  - 
+  - Obstacles
   - 
   - 
   - 
@@ -42,4 +42,7 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Obstacles
+    uniqueID: 2288671503
     locked: 0

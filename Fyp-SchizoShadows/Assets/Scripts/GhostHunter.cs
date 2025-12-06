@@ -1,31 +1,32 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class GhostHunter : MonoBehaviour
 {
     [Header("References")]
-    public SanityManager sanityManager;      // Reference to sanity manager
-    public Transform player;                  // The XR Origin / Player
-    public Animator ghostAnimator;            // Ghost's animator component
+    public SanityManager sanityManager;
+    public Transform player;
+    public Animator ghostAnimator;
 
     [Header("Hunt Settings")]
     [Range(0f, 1f)]
-    public float sanityThreshold = 0.5f;      // Start hunting at 50% sanity
-    public float huntSpeed = 3f;              // How fast ghost moves when hunting
-    public float stopDistance = 1.5f;         // How close ghost gets before stopping
-    public float rotationSpeed = 5f;          // How fast ghost turns toward player
+    public float sanityThreshold = 0.5f;
+    public float huntSpeed = 3f;
+    public float stopDistance = 1.5f;
+    public float rotationSpeed = 5f;
 
     [Header("Spawn Settings")]
-    public Transform spawnPoint;              // Where ghost spawns/starts from
-    public float returnSpeed = 2f;            // Speed when returning to spawn
+    public Transform spawnPoint;
+    public float returnSpeed = 2f;
 
     [Header("Audio (Optional)")]
-    public AudioSource huntingSound;          // Scary ambient sound when hunting
-    public AudioSource catchSound;            // Sound when ghost catches player
+    public AudioSource huntingSound;
+    public AudioSource catchSound;
 
     [Header("Catch Settings")]
-    public bool canCatchPlayer = true;        // Can the ghost catch the player?
-    public float catchDistance = 1f;          // Distance to "catch" player
-    public int gameOverSceneIndex = 0;        // Scene to load on catch (game over)
+    public bool canCatchPlayer = true;
+    public float catchDistance = 1f;
+    public int gameOverSceneIndex = 0;
 
     // Private variables
     private bool isHunting = false;
@@ -33,10 +34,11 @@ public class GhostHunter : MonoBehaviour
     private Vector3 originalPosition;
     private Quaternion originalRotation;
     private bool playerCaught = false;
+    private NavMeshAgent navAgent;
+    private bool useNavMesh = false;
 
     void Start()
     {
-        // Store original position if no spawn point assigned
         originalPosition = transform.position;
         originalRotation = transform.rotation;
 
@@ -45,6 +47,16 @@ public class GhostHunter : MonoBehaviour
             hasSpawnPoint = true;
             originalPosition = spawnPoint.position;
             originalRotation = spawnPoint.rotation;
+        }
+
+        // Check for NavMeshAgent
+        navAgent = GetComponent<NavMeshAgent>();
+        if (navAgent != null)
+        {
+            useNavMesh = true;
+            navAgent.speed = huntSpeed;
+            navAgent.stoppingDistance = stopDistance;
+            navAgent.isStopped = true;
         }
 
         // Auto-find references if not assigned
@@ -57,7 +69,6 @@ public class GhostHunter : MonoBehaviour
 
         if (player == null)
         {
-            // Try to find XR Origin
             var xrOrigin = FindObjectOfType<Unity.XR.CoreUtils.XROrigin>();
             if (xrOrigin != null)
             {
@@ -65,7 +76,6 @@ public class GhostHunter : MonoBehaviour
             }
             else
             {
-                // Fallback: find main camera
                 player = Camera.main?.transform;
             }
 
@@ -85,11 +95,9 @@ public class GhostHunter : MonoBehaviour
     {
         if (sanityManager == null || player == null || playerCaught) return;
 
-        // Check if sanity is below threshold
         float sanityPercent = sanityManager.GetSanityPercent();
         bool shouldHunt = sanityPercent <= sanityThreshold;
 
-        // State changed - start or stop hunting
         if (shouldHunt && !isHunting)
         {
             StartHunting();
@@ -99,7 +107,6 @@ public class GhostHunter : MonoBehaviour
             StopHunting();
         }
 
-        // Execute behavior based on state
         if (isHunting)
         {
             HuntPlayer();
@@ -115,13 +122,16 @@ public class GhostHunter : MonoBehaviour
         isHunting = true;
         Debug.Log("Ghost: HUNTING STARTED - Sanity too low!");
 
-        // Trigger animation
         if (ghostAnimator != null)
         {
             ghostAnimator.SetBool("isHunting", true);
         }
 
-        // Play hunting sound
+        if (useNavMesh && navAgent != null)
+        {
+            navAgent.isStopped = false;
+        }
+
         if (huntingSound != null && !huntingSound.isPlaying)
         {
             huntingSound.Play();
@@ -133,13 +143,16 @@ public class GhostHunter : MonoBehaviour
         isHunting = false;
         Debug.Log("Ghost: Stopped hunting - Sanity restored");
 
-        // Trigger animation
         if (ghostAnimator != null)
         {
             ghostAnimator.SetBool("isHunting", false);
         }
 
-        // Stop hunting sound
+        if (useNavMesh && navAgent != null)
+        {
+            navAgent.isStopped = true;
+        }
+
         if (huntingSound != null && huntingSound.isPlaying)
         {
             huntingSound.Stop();
@@ -150,30 +163,37 @@ public class GhostHunter : MonoBehaviour
     {
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
-        // Check if caught player
         if (canCatchPlayer && distanceToPlayer <= catchDistance)
         {
             CatchPlayer();
             return;
         }
 
-        // Move toward player if not too close
-        if (distanceToPlayer > stopDistance)
+        if (useNavMesh && navAgent != null)
         {
-            // Calculate direction to player (ignore Y for ground movement, or include for flying ghost)
-            Vector3 direction = (player.position - transform.position).normalized;
-
-            // For ground movement, zero out Y
-            // direction.y = 0; // Uncomment this if ghost should stay on ground
-
-            // Move toward player
-            transform.position += direction * huntSpeed * Time.deltaTime;
-
-            // Rotate to face player
-            if (direction != Vector3.zero)
+            // Use NavMesh pathfinding
+            navAgent.SetDestination(player.position);
+        }
+        else
+        {
+            // Fallback: Simple movement (keeps original height)
+            if (distanceToPlayer > stopDistance)
             {
-                Quaternion targetRotation = Quaternion.LookRotation(direction);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+                Vector3 targetPosition = player.position;
+                targetPosition.y = originalPosition.y;
+
+                Vector3 direction = (targetPosition - transform.position).normalized;
+                transform.position += direction * huntSpeed * Time.deltaTime;
+
+                if (direction != Vector3.zero)
+                {
+                    direction.y = 0;
+                    if (direction != Vector3.zero)
+                    {
+                        Quaternion targetRotation = Quaternion.LookRotation(direction);
+                        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+                    }
+                }
             }
         }
     }
@@ -182,14 +202,26 @@ public class GhostHunter : MonoBehaviour
     {
         float distanceToSpawn = Vector3.Distance(transform.position, originalPosition);
 
-        // If not at spawn point, move back
         if (distanceToSpawn > 0.5f)
         {
-            Vector3 direction = (originalPosition - transform.position).normalized;
-            transform.position += direction * returnSpeed * Time.deltaTime;
-
-            // Rotate back to original rotation
-            transform.rotation = Quaternion.Slerp(transform.rotation, originalRotation, rotationSpeed * Time.deltaTime);
+            if (useNavMesh && navAgent != null)
+            {
+                navAgent.isStopped = false;
+                navAgent.SetDestination(originalPosition);
+            }
+            else
+            {
+                Vector3 direction = (originalPosition - transform.position).normalized;
+                transform.position += direction * returnSpeed * Time.deltaTime;
+                transform.rotation = Quaternion.Slerp(transform.rotation, originalRotation, rotationSpeed * Time.deltaTime);
+            }
+        }
+        else
+        {
+            if (useNavMesh && navAgent != null)
+            {
+                navAgent.isStopped = true;
+            }
         }
     }
 
@@ -198,31 +230,31 @@ public class GhostHunter : MonoBehaviour
         playerCaught = true;
         Debug.Log("Ghost: PLAYER CAUGHT!");
 
-        // Play catch sound
+        if (useNavMesh && navAgent != null)
+        {
+            navAgent.isStopped = true;
+        }
+
         if (catchSound != null)
         {
             catchSound.Play();
         }
 
-        // Stop hunting sound
         if (huntingSound != null)
         {
             huntingSound.Stop();
         }
 
-        // Trigger game over (load scene)
         if (SceneTransitionManager.singleton != null)
         {
             SceneTransitionManager.singleton.GoToScene(gameOverSceneIndex);
         }
         else
         {
-            // Fallback: load scene directly
             UnityEngine.SceneManagement.SceneManager.LoadScene(gameOverSceneIndex);
         }
     }
 
-    // Public methods to control the ghost externally
     public void ForceStartHunting()
     {
         StartHunting();
@@ -240,24 +272,25 @@ public class GhostHunter : MonoBehaviour
         transform.position = originalPosition;
         transform.rotation = originalRotation;
 
+        if (useNavMesh && navAgent != null)
+        {
+            navAgent.isStopped = true;
+        }
+
         if (ghostAnimator != null)
         {
             ghostAnimator.SetBool("isHunting", false);
         }
     }
 
-    // Visualize in editor
     void OnDrawGizmosSelected()
     {
-        // Show hunt range
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, stopDistance);
 
-        // Show catch range
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, catchDistance);
 
-        // Show spawn point
         if (spawnPoint != null)
         {
             Gizmos.color = Color.green;
