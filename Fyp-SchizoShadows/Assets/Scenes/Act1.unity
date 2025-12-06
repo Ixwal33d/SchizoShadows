@@ -9945,7 +9945,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &491000653
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10412,7 +10412,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: b24afe7fa8f8ced4aa449e1f1d6e043f, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -10508,7 +10508,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 2e0d9320b146cfd4897b2724fc911694, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -10604,7 +10604,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 7c24dd0e0967f1b429e0cae909e8ffe4, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -10734,9 +10734,9 @@ MonoBehaviour:
   ghostBreathing: {fileID: 541829693}
   catchSound: {fileID: 0}
   alwaysVisible: 1
-  jumpscareDistance: 2
+  jumpscareDistance: 1
   jumpscareDuration: 7
-  shakeIntensity: 0.3
+  shakeIntensity: 5
   shakeSpeed: 30
   jumpscareSound: {fileID: 0}
   jumpscareImage: {fileID: 0}
