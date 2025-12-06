@@ -8,7 +8,7 @@ public class MinimapCamera : MonoBehaviour
 {
     [Header("Minimap Settings")]
     [SerializeField] private Transform player; // Your VR camera/player
-    [SerializeField] private float height = 20f; // How high above player
+    [SerializeField] private float height = 8f; // How high above player
     [SerializeField] private bool followPlayer = true;
     [SerializeField] private bool rotateWithPlayer = false;
 
