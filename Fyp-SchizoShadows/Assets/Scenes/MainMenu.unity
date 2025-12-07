@@ -137,7 +137,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &79910498
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3601,8 +3601,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4280690214
-  m_fontColor: {r: 0.1509434, g: 0.1509434, b: 0.1509434, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -4988,9 +4988,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02458705f3c07db428548f684dc201c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainButtonsPanel: {fileID: 0}
-  optionsPanel: {fileID: 0}
-  aboutPanel: {fileID: 0}
+  mainButtonsPanel: {fileID: 1163744328}
+  optionsPanel: {fileID: 96565793}
+  aboutPanel: {fileID: 79910497}
   gameSceneName: GameLevel
 --- !u!4 &9014170784076170790
 Transform:
