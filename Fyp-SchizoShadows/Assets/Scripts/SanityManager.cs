@@ -33,3 +33,4 @@ public class SanityManager : MonoBehaviour
         return currentSanity / maxSanity;
     }
 }
+

@@ -72,7 +72,7 @@ public class PhasmoGhost : MonoBehaviour
     public bool alwaysVisible = false;          // Keep ghost visible for testing
 
     [Header("=== JUMPSCARE SETTINGS ===")]
-    public float jumpscareDistance = 0.5f;      // How close ghost face gets to player
+    public float jumpscareDistance = 1f;        // How close ghost face gets to player
     public float jumpscareDuration = 2f;        // How long jumpscare lasts
     public float shakeIntensity = 0.3f;         // Screen shake strength
     public float shakeSpeed = 30f;              // Screen shake speed
@@ -578,20 +578,34 @@ public class PhasmoGhost : MonoBehaviour
             jumpscareImage.SetActive(true);
         }
 
-        // Move ghost face directly in front of player
-        Vector3 targetPosition = playerCamera.transform.position + playerCamera.transform.forward * jumpscareDistance;
+        // Move ghost face directly in front of player (NOT above)
+        Vector3 cameraForward = playerCamera.transform.forward;
+        cameraForward.y = 0; // Keep completely horizontal
 
-        // Position ghost at player's eye level
+        // If player is looking up/down, use their body forward direction
+        if (cameraForward.magnitude < 0.1f)
+        {
+            cameraForward = Vector3.forward;
+        }
+        cameraForward.Normalize();
+
+        // Position ghost in FRONT of player, not above
+        Vector3 targetPosition = playerCamera.transform.position + cameraForward * jumpscareDistance;
+
+        // Keep ghost at same height as camera (eye level)
         targetPosition.y = playerCamera.transform.position.y;
         transform.position = targetPosition;
 
-        // Make ghost face the player correctly
+        // Make ghost face the player
         Vector3 lookDirection = playerCamera.transform.position - transform.position;
-        lookDirection.y = 0; // Keep ghost upright
+        lookDirection.y = 0;
         if (lookDirection != Vector3.zero)
         {
             transform.rotation = Quaternion.LookRotation(lookDirection);
         }
+
+        // Store the correct rotation
+        Quaternion correctRotation = transform.rotation;
 
         // Store original camera position for shake
         Vector3 originalCameraLocalPos = playerCamera.transform.localPosition;
@@ -602,18 +616,21 @@ public class PhasmoGhost : MonoBehaviour
         {
             elapsed += Time.deltaTime;
 
-            // Keep ghost in front of camera at eye level
-            targetPosition = playerCamera.transform.position + playerCamera.transform.forward * jumpscareDistance;
+            // Keep ghost in front of camera (horizontal direction only)
+            cameraForward = playerCamera.transform.forward;
+            cameraForward.y = 0;
+            if (cameraForward.magnitude < 0.1f)
+            {
+                cameraForward = Vector3.forward;
+            }
+            cameraForward.Normalize();
+
+            targetPosition = playerCamera.transform.position + cameraForward * jumpscareDistance;
             targetPosition.y = playerCamera.transform.position.y;
             transform.position = targetPosition;
 
-            // Keep ghost facing player correctly
-            lookDirection = playerCamera.transform.position - transform.position;
-            lookDirection.y = 0;
-            if (lookDirection != Vector3.zero)
-            {
-                transform.rotation = Quaternion.LookRotation(lookDirection);
-            }
+            // Keep ghost rotation stable
+            transform.rotation = correctRotation;
 
             // Screen shake effect
             float shakeX = Mathf.Sin(Time.time * shakeSpeed) * shakeIntensity;
@@ -662,10 +679,11 @@ public class PhasmoGhost : MonoBehaviour
     {
         if (ghostAnimator == null) return;
 
-        bool isHunting = (currentState == GhostState.Hunting || currentState == GhostState.Searching);
+        // Play running animation when ghost is MOVING (wandering or hunting)
         bool isMoving = navAgent.velocity.magnitude > 0.1f;
 
-        ghostAnimator.SetBool("isHunting", isHunting);
+        // Use isMoving to trigger running animation
+        ghostAnimator.SetBool("isHunting", isMoving);
         ghostAnimator.SetBool("isMoving", isMoving);
     }
 
