@@ -9,10 +9,10 @@ public class PhasmoGhost : MonoBehaviour
     {
         Idle,
         Wandering,
-        HuntWarning,    // Lights flicker, warning before hunt
+        HuntWarning,
         Hunting,
         Searching,
-        Cooldown        // Rest period after hunt ends
+        Cooldown
     }
 
     [Header("=== CURRENT STATE (Read Only) ===")]
@@ -34,16 +34,16 @@ public class PhasmoGhost : MonoBehaviour
     [Header("=== HUNT TRIGGER SETTINGS ===")]
     [Range(0f, 1f)]
     public float sanityThreshold = 0.5f;
-    public float huntCheckInterval = 30f;       // Check for hunt every X seconds
-    public float huntChanceMultiplier = 1f;     // Higher = more frequent hunts
+    public float huntCheckInterval = 30f;
+    public float huntChanceMultiplier = 1f;
     private float huntCheckTimer = 0f;
 
     [Header("=== HUNT SETTINGS ===")]
-    public float huntDuration = 30f;            // Hunt lasts 30 seconds
+    public float huntDuration = 30f;
     public float huntSpeed = 5f;
-    public float huntWarningDuration = 3f;      // Warning before hunt starts
-    public float searchDuration = 10f;          // Time spent searching after losing player
-    public float huntCooldown = 20f;            // Time before ghost can hunt again
+    public float huntWarningDuration = 3f;
+    public float searchDuration = 10f;
+    public float huntCooldown = 20f;
     public float catchDistance = 1.2f;
     private float cooldownTimer = 0f;
 
@@ -60,31 +60,29 @@ public class PhasmoGhost : MonoBehaviour
     public float flickerSpeed = 0.1f;
     public bool autoFindLights = true;
 
-
-
     [Header("=== AUDIO ===")]
-    public AudioSource heartbeatSound;          // Plays during hunt warning
-    public AudioSource huntingMusic;            // Intense music during hunt
-    public AudioSource ghostBreathing;          // Ambient ghost sounds
-    public AudioSource catchSound;              // When ghost catches player
+    public AudioSource heartbeatSound;
+    public AudioSource huntingMusic;
+    public AudioSource ghostBreathing;
+    public AudioSource catchSound;
 
     [Header("=== DEBUG / TESTING ===")]
-    public bool alwaysVisible = false;          // Keep ghost visible for testing
+    public bool alwaysVisible = false;
 
     [Header("=== JUMPSCARE SETTINGS ===")]
-    public float jumpscareDistance = 1f;        // How close ghost face gets to player
-    public float jumpscareDuration = 2f;        // How long jumpscare lasts
-    public float shakeIntensity = 0.3f;         // Screen shake strength
-    public float shakeSpeed = 30f;              // Screen shake speed
-    public AudioSource jumpscareSound;          // Loud scream sound
-    public GameObject jumpscareImage;           // Optional: 2D scary face image on screen
+    public float jumpscareDistance = 1f;
+    public float jumpscareDuration = 2f;
+    public float shakeIntensity = 0.3f;
+    public float shakeSpeed = 30f;
+    public AudioSource jumpscareSound;
+    public GameObject jumpscareImage;
 
     [Header("=== SCREEN EFFECTS ===")]
-    public GameObject huntWarningEffect;        // Red vignette or screen effect
-    public GameObject huntActiveEffect;         // Effect during active hunt
+    public GameObject huntWarningEffect;
+    public GameObject huntActiveEffect;
 
-    [Header("=== GAME OVER ===")]
-    public int gameOverSceneIndex = 0;
+    [Header("=== GAME OVER UI ===")]
+    public GameObject gameOverPanel; // GAME OVER PANEL UPDATE
 
     // Private variables
     private NavMeshAgent navAgent;
@@ -97,17 +95,10 @@ public class PhasmoGhost : MonoBehaviour
     void Start()
     {
         navAgent = GetComponent<NavMeshAgent>();
-        if (navAgent == null)
-        {
-            Debug.LogError("PhasmoGhost: NavMeshAgent required!");
-            return;
-        }
 
-        // Auto-find sanity manager
         if (sanityManager == null)
             sanityManager = FindObjectOfType<SanityManager>();
 
-        // Auto-find player
         if (player == null)
         {
             var xrOrigin = FindObjectOfType<Unity.XR.CoreUtils.XROrigin>();
@@ -117,25 +108,18 @@ public class PhasmoGhost : MonoBehaviour
                 player = Camera.main?.transform;
         }
 
-        // Auto-find animator
         if (ghostAnimator == null)
-        {
-            ghostAnimator = GetComponent<Animator>();
-            if (ghostAnimator == null)
-                ghostAnimator = GetComponentInChildren<Animator>();
-        }
+            ghostAnimator = GetComponentInChildren<Animator>();
 
-        // Auto-find all lights in scene
         if (autoFindLights)
-        {
             allLights.AddRange(FindObjectsOfType<Light>());
-        }
 
-        // Disable screen effects
         if (huntWarningEffect != null) huntWarningEffect.SetActive(false);
         if (huntActiveEffect != null) huntActiveEffect.SetActive(false);
 
-        // Start wandering (invisible)
+        // Hide Game Over panel
+        if (gameOverPanel != null) gameOverPanel.SetActive(false); // GAME OVER PANEL UPDATE
+
         SetState(GhostState.Wandering);
         SetGhostVisibility(false);
     }
@@ -144,28 +128,31 @@ public class PhasmoGhost : MonoBehaviour
     {
         if (playerCaught || player == null) return;
 
-        // Update visibility check
         canSeePlayer = CheckPlayerVisibility();
 
-        // State machine
         switch (currentState)
         {
             case GhostState.Idle:
                 HandleIdle();
                 break;
+
             case GhostState.Wandering:
                 HandleWander();
                 CheckForHuntTrigger();
                 break;
+
             case GhostState.HuntWarning:
                 HandleHuntWarning();
                 break;
+
             case GhostState.Hunting:
                 HandleHunting();
                 break;
+
             case GhostState.Searching:
                 HandleSearching();
                 break;
+
             case GhostState.Cooldown:
                 HandleCooldown();
                 break;
@@ -173,8 +160,6 @@ public class PhasmoGhost : MonoBehaviour
 
         UpdateAnimator();
     }
-
-    #region State Handlers
 
     void HandleIdle()
     {
@@ -214,15 +199,10 @@ public class PhasmoGhost : MonoBehaviour
             huntCheckTimer = 0f;
 
             float sanityPercent = sanityManager.GetSanityPercent();
-
-            // Lower sanity = higher hunt chance
             if (sanityPercent <= sanityThreshold)
             {
-                // Calculate hunt chance based on sanity
                 float huntChance = (1f - sanityPercent) * huntChanceMultiplier;
                 float roll = Random.Range(0f, 1f);
-
-                Debug.Log($"Hunt check: Sanity {sanityPercent:P0}, Chance {huntChance:P0}, Roll {roll:F2}");
 
                 if (roll <= huntChance)
                 {
@@ -231,7 +211,6 @@ public class PhasmoGhost : MonoBehaviour
             }
         }
 
-        // Also start hunt if ghost sees player directly
         if (canSeePlayer && currentState == GhostState.Wandering)
         {
             StartHuntWarning();
@@ -255,14 +234,12 @@ public class PhasmoGhost : MonoBehaviour
         huntTimer -= Time.deltaTime;
         currentHuntTimer = huntTimer;
 
-        // Check if hunt time is over
         if (huntTimer <= 0)
         {
             EndHunt();
             return;
         }
 
-        // Check for catch
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         if (distanceToPlayer <= catchDistance)
         {
@@ -272,16 +249,13 @@ public class PhasmoGhost : MonoBehaviour
 
         if (canSeePlayer)
         {
-            // Chase player
             lastKnownPlayerPosition = player.position;
             navAgent.SetDestination(player.position);
         }
         else
         {
-            // Lost sight, go to last known position
             navAgent.SetDestination(lastKnownPlayerPosition);
 
-            // If reached last known position, start searching
             if (!navAgent.pathPending && navAgent.remainingDistance < 2f)
             {
                 SetState(GhostState.Searching);
@@ -295,21 +269,18 @@ public class PhasmoGhost : MonoBehaviour
         navAgent.speed = wanderSpeed;
         searchTimer -= Time.deltaTime;
 
-        // Search random nearby locations
         if (!navAgent.pathPending && navAgent.remainingDistance < 1f)
         {
             SearchNearbyLocation();
         }
 
-        // Check if we can see player while searching
         if (canSeePlayer)
         {
             SetState(GhostState.Hunting);
-            huntTimer = huntDuration * 0.5f; // Resume hunt with half time
+            huntTimer = huntDuration * 0.5f;
             return;
         }
 
-        // Search time over
         if (searchTimer <= 0)
         {
             EndHunt();
@@ -326,75 +297,44 @@ public class PhasmoGhost : MonoBehaviour
         }
     }
 
-    #endregion
-
-    #region Hunt Control
-
     void StartHuntWarning()
     {
-        Debug.Log("Ghost: HUNT WARNING - Lights flickering!");
         SetState(GhostState.HuntWarning);
         warningTimer = huntWarningDuration;
 
-        // Start light flickering
         if (flickerCoroutine != null) StopCoroutine(flickerCoroutine);
         flickerCoroutine = StartCoroutine(FlickerLights());
 
-        // Play heartbeat
-        if (heartbeatSound != null)
-        {
-            heartbeatSound.Play();
-        }
-
-        // Show warning effect
-        if (huntWarningEffect != null)
-        {
-            huntWarningEffect.SetActive(true);
-        }
+        if (heartbeatSound != null) heartbeatSound.Play();
+        if (huntWarningEffect != null) huntWarningEffect.SetActive(true);
     }
 
     void StartHunt()
     {
-        Debug.Log("Ghost: HUNT STARTED!");
         SetState(GhostState.Hunting);
         huntTimer = huntDuration;
-        currentHuntTimer = huntTimer;
 
-        // Make ghost visible
         SetGhostVisibility(true);
-
-        // Set destination to player
         lastKnownPlayerPosition = player.position;
         navAgent.SetDestination(player.position);
         navAgent.isStopped = false;
 
-        // Switch warning to hunt effect
         if (huntWarningEffect != null) huntWarningEffect.SetActive(false);
         if (huntActiveEffect != null) huntActiveEffect.SetActive(true);
 
-        // Play hunt music
         if (huntingMusic != null && !huntingMusic.isPlaying)
-        {
             huntingMusic.Play();
-        }
 
-        // Stop heartbeat
-        if (heartbeatSound != null)
-        {
-            heartbeatSound.Stop();
-        }
+        if (heartbeatSound != null) heartbeatSound.Stop();
     }
 
     void EndHunt()
     {
-        Debug.Log("Ghost: Hunt ended, entering cooldown");
         SetState(GhostState.Cooldown);
         cooldownTimer = huntCooldown;
 
-        // Make ghost invisible
         SetGhostVisibility(false);
 
-        // Stop effects
         if (flickerCoroutine != null)
         {
             StopCoroutine(flickerCoroutine);
@@ -404,41 +344,31 @@ public class PhasmoGhost : MonoBehaviour
         if (huntActiveEffect != null) huntActiveEffect.SetActive(false);
         if (huntWarningEffect != null) huntWarningEffect.SetActive(false);
 
-        // Stop music
         if (huntingMusic != null) huntingMusic.Stop();
         if (heartbeatSound != null) heartbeatSound.Stop();
 
-        // Return to spawn area
         SetRandomDestination();
     }
-
-    #endregion
-
-    #region Detection & Visibility
 
     bool CheckPlayerVisibility()
     {
         if (player == null) return false;
 
         Vector3 directionToPlayer = (player.position - transform.position).normalized;
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        float distance = Vector3.Distance(transform.position, player.position);
 
-        if (distanceToPlayer > viewDistance) return false;
+        if (distance > viewDistance) return false;
 
-        float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
-        if (angleToPlayer > viewAngle / 2f) return false;
+        float angle = Vector3.Angle(transform.forward, directionToPlayer);
+        if (angle > viewAngle / 2f) return false;
 
-        // Raycast check
-        Vector3 eyePosition = transform.position + Vector3.up * 1.5f;
+        Vector3 eyePos = transform.position + Vector3.up * 1.5f;
         Vector3 playerCenter = player.position + Vector3.up * 1f;
 
         RaycastHit hit;
-        if (Physics.Raycast(eyePosition, (playerCenter - eyePosition).normalized, out hit, viewDistance, obstacleLayer))
+        if (Physics.Raycast(eyePos, (playerCenter - eyePos).normalized, out hit, viewDistance, obstacleLayer))
         {
-            if (hit.transform != player && !hit.transform.IsChildOf(player))
-            {
-                return false;
-            }
+            if (hit.transform != player && !hit.transform.IsChildOf(player)) return false;
         }
 
         return true;
@@ -446,20 +376,11 @@ public class PhasmoGhost : MonoBehaviour
 
     void SetGhostVisibility(bool visible)
     {
-        // If alwaysVisible is on, never hide the ghost
         if (alwaysVisible) visible = true;
 
         Renderer[] renderers = GetComponentsInChildren<Renderer>();
-        foreach (Renderer r in renderers)
-        {
-            r.enabled = visible;
-        }
-        Debug.Log($"Ghost visibility: {visible}");
+        foreach (Renderer r in renderers) r.enabled = visible;
     }
-
-    #endregion
-
-    #region Light Flickering
 
     IEnumerator FlickerLights()
     {
@@ -468,9 +389,7 @@ public class PhasmoGhost : MonoBehaviour
             foreach (Light light in allLights)
             {
                 if (light != null)
-                {
                     light.enabled = !light.enabled;
-                }
             }
             yield return new WaitForSeconds(Random.Range(0.05f, flickerSpeed));
         }
@@ -482,21 +401,13 @@ public class PhasmoGhost : MonoBehaviour
     {
         foreach (Light light in allLights)
         {
-            if (light != null)
-            {
-                light.enabled = true;
-            }
+            if (light != null) light.enabled = true;
         }
     }
 
-    #endregion
-
-    #region Movement
-
     void SetRandomDestination()
     {
-        Vector3 randomDirection = Random.insideUnitSphere * wanderRadius;
-        randomDirection += transform.position;
+        Vector3 randomDirection = Random.insideUnitSphere * wanderRadius + transform.position;
 
         NavMeshHit hit;
         if (NavMesh.SamplePosition(randomDirection, out hit, wanderRadius, NavMesh.AllAreas))
@@ -507,8 +418,7 @@ public class PhasmoGhost : MonoBehaviour
 
     void SearchNearbyLocation()
     {
-        Vector3 randomDirection = Random.insideUnitSphere * 10f;
-        randomDirection += lastKnownPlayerPosition;
+        Vector3 randomDirection = Random.insideUnitSphere * 10f + lastKnownPlayerPosition;
 
         NavMeshHit hit;
         if (NavMesh.SamplePosition(randomDirection, out hit, 10f, NavMesh.AllAreas))
@@ -517,179 +427,140 @@ public class PhasmoGhost : MonoBehaviour
         }
     }
 
-    #endregion
-
-    #region Catch Player
-
     void CatchPlayer()
     {
         playerCaught = true;
-        Debug.Log("Ghost: PLAYER CAUGHT - JUMPSCARE!");
 
         navAgent.isStopped = true;
 
-        // Stop all effects
         if (flickerCoroutine != null) StopCoroutine(flickerCoroutine);
         ResetLights();
+
         if (huntingMusic != null) huntingMusic.Stop();
         if (huntActiveEffect != null) huntActiveEffect.SetActive(false);
 
-        // Start jumpscare sequence
         StartCoroutine(JumpscareSequence());
     }
 
     IEnumerator JumpscareSequence()
     {
-        // Make ghost visible
         SetGhostVisibility(true);
 
-        // Get camera reference
         Camera playerCamera = Camera.main;
         if (playerCamera == null)
         {
             var xrOrigin = FindObjectOfType<Unity.XR.CoreUtils.XROrigin>();
             if (xrOrigin != null)
-            {
                 playerCamera = xrOrigin.GetComponentInChildren<Camera>();
-            }
         }
 
         if (playerCamera == null)
         {
-            Debug.LogError("No camera found for jumpscare!");
             yield return new WaitForSeconds(1f);
             LoadGameOver();
             yield break;
         }
 
-        // Play jumpscare sound
         if (jumpscareSound != null)
-        {
             jumpscareSound.Play();
-        }
         else if (catchSound != null)
-        {
             catchSound.Play();
-        }
 
-        // Show jumpscare image if available
         if (jumpscareImage != null)
-        {
             jumpscareImage.SetActive(true);
-        }
 
-        // Move ghost face directly in front of player (NOT above)
         Vector3 cameraForward = playerCamera.transform.forward;
-        cameraForward.y = 0; // Keep completely horizontal
-
-        // If player is looking up/down, use their body forward direction
+        cameraForward.y = 0;
         if (cameraForward.magnitude < 0.1f)
-        {
             cameraForward = Vector3.forward;
-        }
+
         cameraForward.Normalize();
-
-        // Position ghost in FRONT of player, not above
         Vector3 targetPosition = playerCamera.transform.position + cameraForward * jumpscareDistance;
-
-        // Keep ghost at same height as camera (eye level)
         targetPosition.y = playerCamera.transform.position.y;
         transform.position = targetPosition;
 
-        // Make ghost face the player
         Vector3 lookDirection = playerCamera.transform.position - transform.position;
         lookDirection.y = 0;
-        if (lookDirection != Vector3.zero)
-        {
-            transform.rotation = Quaternion.LookRotation(lookDirection);
-        }
+        transform.rotation = Quaternion.LookRotation(lookDirection);
 
-        // Store the correct rotation
         Quaternion correctRotation = transform.rotation;
 
-        // Store original camera position for shake
         Vector3 originalCameraLocalPos = playerCamera.transform.localPosition;
+
         float elapsed = 0f;
 
-        // Jumpscare loop - shake screen and keep ghost in face
         while (elapsed < jumpscareDuration)
         {
             elapsed += Time.deltaTime;
 
-            // Keep ghost in front of camera (horizontal direction only)
             cameraForward = playerCamera.transform.forward;
             cameraForward.y = 0;
             if (cameraForward.magnitude < 0.1f)
-            {
                 cameraForward = Vector3.forward;
-            }
+
             cameraForward.Normalize();
 
             targetPosition = playerCamera.transform.position + cameraForward * jumpscareDistance;
             targetPosition.y = playerCamera.transform.position.y;
             transform.position = targetPosition;
 
-            // Keep ghost rotation stable
             transform.rotation = correctRotation;
 
-            // Screen shake effect
             float shakeX = Mathf.Sin(Time.time * shakeSpeed) * shakeIntensity;
             float shakeY = Mathf.Cos(Time.time * shakeSpeed * 1.3f) * shakeIntensity;
-            playerCamera.transform.localPosition = originalCameraLocalPos + new Vector3(shakeX, shakeY, 0);
+
+            playerCamera.transform.localPosition =
+                originalCameraLocalPos + new Vector3(shakeX, shakeY, 0);
 
             yield return null;
         }
 
-        // Reset camera position
         playerCamera.transform.localPosition = originalCameraLocalPos;
 
-        // Hide jumpscare image
         if (jumpscareImage != null)
-        {
             jumpscareImage.SetActive(false);
-        }
 
-        // Load game over scene
         LoadGameOver();
     }
 
+    // =============================
+    //     GAME OVER PANEL UPDATE
+    // =============================
     void LoadGameOver()
     {
-        if (SceneTransitionManager.singleton != null)
-        {
-            SceneTransitionManager.singleton.GoToScene(gameOverSceneIndex);
-        }
-        else
-        {
-            UnityEngine.SceneManagement.SceneManager.LoadScene(gameOverSceneIndex);
-        }
+        Debug.Log("GAME OVER - Showing UI Panel");
+
+        // Disable player controller if exists
+        var controller = player.GetComponent<CharacterController>();
+        if (controller != null)
+            controller.enabled = false;
+
+        // Show Game Over UI Panel
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(true);
+
+        // Stop ghost completely
+        if (navAgent != null)
+            navAgent.isStopped = true;
+
+        // Optional: Freeze game
+        // Time.timeScale = 0f;
     }
-
-    #endregion
-
-    #region State Management
+    // =============================
 
     void SetState(GhostState newState)
     {
         currentState = newState;
-        Debug.Log($"Ghost State: {newState}");
     }
 
     void UpdateAnimator()
     {
         if (ghostAnimator == null) return;
 
-        // Play running animation when ghost is MOVING (wandering or hunting)
         bool isMoving = navAgent.velocity.magnitude > 0.1f;
-
-        // Use isMoving to trigger running animation
         ghostAnimator.SetBool("isHunting", isMoving);
         ghostAnimator.SetBool("isMoving", isMoving);
     }
-
-    #endregion
-
-    #region Public Methods
 
     public void ForceHunt()
     {
@@ -705,39 +576,4 @@ public class PhasmoGhost : MonoBehaviour
         EndHunt();
         SetState(GhostState.Wandering);
     }
-
-    #endregion
-
-    #region Debug
-
-    void OnDrawGizmosSelected()
-    {
-        // Wander radius
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, wanderRadius);
-
-        // View distance
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, viewDistance);
-
-        // View cone
-        Gizmos.color = Color.blue;
-        Vector3 leftBoundary = Quaternion.Euler(0, -viewAngle / 2, 0) * transform.forward * viewDistance;
-        Vector3 rightBoundary = Quaternion.Euler(0, viewAngle / 2, 0) * transform.forward * viewDistance;
-        Gizmos.DrawLine(transform.position, transform.position + leftBoundary);
-        Gizmos.DrawLine(transform.position, transform.position + rightBoundary);
-
-        // Catch distance
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, catchDistance);
-
-        // Line to player
-        if (canSeePlayer && player != null)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.position + Vector3.up, player.position + Vector3.up);
-        }
-    }
-
-    #endregion
 }
