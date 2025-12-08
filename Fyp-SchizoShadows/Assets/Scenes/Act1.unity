@@ -876,7 +876,7 @@ MonoBehaviour:
   noteColor: {r: 0.38900334, g: 0.3244357, b: 0.93962264, a: 1}
   destroyAfterReading: 1
   canReadMultipleTimes: 0
-  pickupSound: {fileID: 8300000, guid: 8286a973060088348a7fa951d7fdf30b, type: 3}
+  pickupSound: {fileID: 8300000, guid: 4dd33d7bc8469724d87f6dbe0e7957a8, type: 3}
   readSound: {fileID: 0}
 --- !u!4 &36172463 stripped
 Transform:
@@ -1307,7 +1307,7 @@ MonoBehaviour:
   noteColor: {r: 0.7207546, g: 0.67596996, b: 0.32501954, a: 1}
   destroyAfterReading: 1
   canReadMultipleTimes: 0
-  pickupSound: {fileID: 0}
+  pickupSound: {fileID: 8300000, guid: 4dd33d7bc8469724d87f6dbe0e7957a8, type: 3}
   readSound: {fileID: 0}
 --- !u!114 &81123314
 MonoBehaviour:
@@ -3710,7 +3710,7 @@ MonoBehaviour:
   noteColor: {r: 1, g: 1, b: 1, a: 1}
   destroyAfterReading: 0
   canReadMultipleTimes: 1
-  pickupSound: {fileID: 0}
+  pickupSound: {fileID: 8300000, guid: 4dd33d7bc8469724d87f6dbe0e7957a8, type: 3}
   readSound: {fileID: 0}
 --- !u!114 &393004447
 MonoBehaviour:
@@ -10973,6 +10973,7 @@ MonoBehaviour:
   jumpscareDuration: 7
   shakeIntensity: 5
   shakeSpeed: 30
+  ghostFaceHeight: 1.6
   jumpscareSound: {fileID: 0}
   jumpscareImage: {fileID: 314078052}
   huntWarningEffect: {fileID: 0}
@@ -12877,7 +12878,7 @@ MonoBehaviour:
   keyID: MasterKey
   keyName: Old Key
   keyColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  pickupSound: {fileID: 8300000, guid: ada5c8dc0f5d4bb4b06205bd88ad9e90, type: 3}
+  pickupSound: {fileID: 0}
   wrongKeySound: {fileID: 0}
   doorDetectDistance: 3
 --- !u!114 &713254779
@@ -29914,7 +29915,7 @@ MonoBehaviour:
   noteColor: {r: 0.6377357, g: 0.35015297, b: 0.5377632, a: 1}
   destroyAfterReading: 0
   canReadMultipleTimes: 1
-  pickupSound: {fileID: 0}
+  pickupSound: {fileID: 8300000, guid: 4dd33d7bc8469724d87f6dbe0e7957a8, type: 3}
   readSound: {fileID: 0}
 --- !u!114 &1622746905
 MonoBehaviour:
