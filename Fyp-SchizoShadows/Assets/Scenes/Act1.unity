@@ -869,7 +869,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   noteTitle: Want to Escape?
-  noteText: Find the key and open the door.....
+  noteText: Find the key and open the door
+  voiceOverClip: {fileID: 8300000, guid: acd027bc388b5184bb4ff96b0778d7b3, type: 3}
+  voiceOverDelay: 0.5
+  playVoiceOnGrab: 1
   noteColor: {r: 0.38900334, g: 0.3244357, b: 0.93962264, a: 1}
   destroyAfterReading: 1
   canReadMultipleTimes: 0
@@ -1298,6 +1301,9 @@ MonoBehaviour:
   noteTitle: Torn Diary Page
   noteText: Mother always hides his important keys in cold places. Check the icebox...no,
     wait, the bathroom? I can't remember.
+  voiceOverClip: {fileID: 8300000, guid: b2d9753022fd6e14caa200b7196db319, type: 3}
+  voiceOverDelay: 0.5
+  playVoiceOnGrab: 1
   noteColor: {r: 0.7207546, g: 0.67596996, b: 0.32501954, a: 1}
   destroyAfterReading: 1
   canReadMultipleTimes: 0
@@ -2904,6 +2910,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: XR Device Simulator
       objectReference: {fileID: 0}
+    - target: {fileID: 6598815579406187037, guid: 18ddb545287c546e19cc77dc9fbb2189,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3691,8 +3702,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e858be899d3487e4083e14fab05e833f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  noteTitle: Waleed`s Advice
-  noteText: 'Incident  Room 505........ '
+  noteTitle: 
+  noteText: Incident Room 505
+  voiceOverClip: {fileID: 8300000, guid: 24de2d379b5d9f843adca895e7c6c7db, type: 3}
+  voiceOverDelay: 0.5
+  playVoiceOnGrab: 1
   noteColor: {r: 1, g: 1, b: 1, a: 1}
   destroyAfterReading: 0
   canReadMultipleTimes: 1
@@ -9571,7 +9585,7 @@ MonoBehaviour:
   m_EnableInputActions: 1
   m_ModelPrefab: {fileID: 0}
   m_ModelParent: {fileID: 0}
-  m_Model: {fileID: 0}
+  m_Model: {fileID: 365540387}
   m_AnimateModel: 0
   m_ModelSelectTransition: 
   m_ModelDeSelectTransition: 
@@ -10999,7 +11013,7 @@ CapsuleCollider:
   m_Radius: 0.5
   m_Height: 1
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0.88, z: 0}
 --- !u!1 &542064257 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1427988826737582784, guid: c1a1db9ba5d39a94c9952b68f2ca24cc,
@@ -26132,7 +26146,7 @@ MonoBehaviour:
   m_EnableInputActions: 1
   m_ModelPrefab: {fileID: 0}
   m_ModelParent: {fileID: 0}
-  m_Model: {fileID: 0}
+  m_Model: {fileID: 1565944589}
   m_AnimateModel: 0
   m_ModelSelectTransition: 
   m_ModelDeSelectTransition: 
@@ -26365,7 +26379,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1281337335}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f9ac216f0eb04754b1d938aac6380b31, type: 3}
   m_Name: 
@@ -29517,11 +29531,11 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 440494664531274355, guid: c1a1db9ba5d39a94c9952b68f2ca24cc, type: 3}
 --- !u!1 &1582202651 stripped
@@ -29894,6 +29908,9 @@ MonoBehaviour:
   noteTitle: ' Quran 2:148:'
   noteText: Wherever you are, Allah will bring you forth all together. Indeed, Allah
     has power over all things,
+  voiceOverClip: {fileID: 8300000, guid: 1cbba3a84c54c5f4e8ac052a751e1f5c, type: 3}
+  voiceOverDelay: 0.5
+  playVoiceOnGrab: 1
   noteColor: {r: 0.6377357, g: 0.35015297, b: 0.5377632, a: 1}
   destroyAfterReading: 0
   canReadMultipleTimes: 1

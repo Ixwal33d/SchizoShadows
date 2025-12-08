@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using System.Collections;
 
 /// <summary>
 /// Readable Note/Clue for VR
 /// Player grabs it and text appears on screen
+/// Now with Voice Over support!
 /// </summary>
 [RequireComponent(typeof(XRGrabInteractable))]
 public class ReadableNote : MonoBehaviour
@@ -11,9 +13,13 @@ public class ReadableNote : MonoBehaviour
     [Header("Note Content")]
     [TextArea(3, 10)]
     [SerializeField] private string noteTitle = "Torn Diary Page";
-
     [TextArea(5, 20)]
     [SerializeField] private string noteText = "The master always hides his important keys in cold places. Check the icebox...no, wait, the bathroom? I can't remember.";
+
+    [Header("Voice Over")]
+    [SerializeField] private AudioClip voiceOverClip;       // Kamil's voice reading/reacting to the note
+    [SerializeField] private float voiceOverDelay = 0.5f;   // Delay before voice starts
+    [SerializeField] private bool playVoiceOnGrab = true;   // Play when grabbed
 
     [Header("Visual Settings")]
     [SerializeField] private Color noteColor = Color.white;
@@ -26,17 +32,25 @@ public class ReadableNote : MonoBehaviour
 
     private XRGrabInteractable grabInteractable;
     private AudioSource audioSource;
+    private AudioSource voiceOverSource;    // Separate audio source for voice over
     private bool hasBeenRead = false;
+    private bool voiceOverPlayed = false;
     private NoteUIManager uiManager;
 
     void Awake()
     {
         grabInteractable = GetComponent<XRGrabInteractable>();
 
-        // Setup audio
+        // Setup audio for pickup/read sounds
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.playOnAwake = false;
-        audioSource.spatialBlend = 1f;
+        audioSource.spatialBlend = 1f;  // 3D sound
+
+        // Setup separate audio source for voice over (2D - in player's head)
+        voiceOverSource = gameObject.AddComponent<AudioSource>();
+        voiceOverSource.playOnAwake = false;
+        voiceOverSource.spatialBlend = 0f;  // 2D sound (voice in head)
+        voiceOverSource.volume = 1f;
 
         // Find UI manager
         uiManager = FindObjectOfType<NoteUIManager>();
@@ -71,6 +85,16 @@ public class ReadableNote : MonoBehaviour
         {
             ShowNote();
             hasBeenRead = true;
+
+            // Play voice over
+            if (playVoiceOnGrab && voiceOverClip != null)
+            {
+                if (canReadMultipleTimes || !voiceOverPlayed)
+                {
+                    StartCoroutine(PlayVoiceOver());
+                    voiceOverPlayed = true;
+                }
+            }
         }
 
         Debug.Log($"📝 Reading note: {noteTitle}");
@@ -83,6 +107,12 @@ public class ReadableNote : MonoBehaviour
         {
             uiManager.HideNote();
         }
+
+        // Stop voice over when note is released (optional - remove if you want voice to continue)
+        // if (voiceOverSource.isPlaying)
+        // {
+        //     voiceOverSource.Stop();
+        // }
 
         // Destroy after reading if set
         if (destroyAfterReading && hasBeenRead)
@@ -110,8 +140,28 @@ public class ReadableNote : MonoBehaviour
         }
     }
 
+    IEnumerator PlayVoiceOver()
+    {
+        // Wait for delay
+        yield return new WaitForSeconds(voiceOverDelay);
+
+        // Play voice over
+        if (voiceOverClip != null && voiceOverSource != null)
+        {
+            voiceOverSource.clip = voiceOverClip;
+            voiceOverSource.Play();
+            Debug.Log($"🎙️ Playing voice over for: {noteTitle}");
+        }
+    }
+
     void DestroyNote()
     {
+        // Stop voice over before destroying
+        if (voiceOverSource != null && voiceOverSource.isPlaying)
+        {
+            voiceOverSource.Stop();
+        }
+
         Debug.Log($"🗑️ Note '{noteTitle}' destroyed after reading.");
         Destroy(gameObject);
     }
@@ -130,5 +180,23 @@ public class ReadableNote : MonoBehaviour
     public bool HasBeenRead()
     {
         return hasBeenRead;
+    }
+
+    // Stop voice over manually if needed
+    public void StopVoiceOver()
+    {
+        if (voiceOverSource != null && voiceOverSource.isPlaying)
+        {
+            voiceOverSource.Stop();
+        }
+    }
+
+    // Play voice over manually (for triggering from other scripts)
+    public void TriggerVoiceOver()
+    {
+        if (voiceOverClip != null)
+        {
+            StartCoroutine(PlayVoiceOver());
+        }
     }
 }
