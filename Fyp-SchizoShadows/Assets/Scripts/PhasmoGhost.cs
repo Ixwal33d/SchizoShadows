@@ -74,6 +74,7 @@ public class PhasmoGhost : MonoBehaviour
     public float jumpscareDuration = 2f;
     public float shakeIntensity = 0.3f;
     public float shakeSpeed = 30f;
+    public float ghostFaceHeight = 1.6f;  // NEW - Adjust this to match your ghost model
     public AudioSource jumpscareSound;
     public GameObject jumpscareImage;
 
@@ -82,7 +83,7 @@ public class PhasmoGhost : MonoBehaviour
     public GameObject huntActiveEffect;
 
     [Header("=== GAME OVER UI ===")]
-    public GameObject gameOverPanel; // GAME OVER PANEL UPDATE
+    public GameObject gameOverPanel;
 
     // Private variables
     private NavMeshAgent navAgent;
@@ -117,8 +118,7 @@ public class PhasmoGhost : MonoBehaviour
         if (huntWarningEffect != null) huntWarningEffect.SetActive(false);
         if (huntActiveEffect != null) huntActiveEffect.SetActive(false);
 
-        // Hide Game Over panel
-        if (gameOverPanel != null) gameOverPanel.SetActive(false); // GAME OVER PANEL UPDATE
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
 
         SetState(GhostState.Wandering);
         SetGhostVisibility(false);
@@ -476,7 +476,9 @@ public class PhasmoGhost : MonoBehaviour
 
         cameraForward.Normalize();
         Vector3 targetPosition = playerCamera.transform.position + cameraForward * jumpscareDistance;
-        targetPosition.y = playerCamera.transform.position.y;
+
+        // FIXED: Subtract ghost face height so face is at eye level
+        targetPosition.y = playerCamera.transform.position.y - ghostFaceHeight;
         transform.position = targetPosition;
 
         Vector3 lookDirection = playerCamera.transform.position - transform.position;
@@ -501,7 +503,9 @@ public class PhasmoGhost : MonoBehaviour
             cameraForward.Normalize();
 
             targetPosition = playerCamera.transform.position + cameraForward * jumpscareDistance;
-            targetPosition.y = playerCamera.transform.position.y;
+
+            // FIXED: Subtract ghost face height so face is at eye level
+            targetPosition.y = playerCamera.transform.position.y - ghostFaceHeight;
             transform.position = targetPosition;
 
             transform.rotation = correctRotation;
@@ -523,30 +527,20 @@ public class PhasmoGhost : MonoBehaviour
         LoadGameOver();
     }
 
-    // =============================
-    //     GAME OVER PANEL UPDATE
-    // =============================
     void LoadGameOver()
     {
         Debug.Log("GAME OVER - Showing UI Panel");
 
-        // Disable player controller if exists
         var controller = player.GetComponent<CharacterController>();
         if (controller != null)
             controller.enabled = false;
 
-        // Show Game Over UI Panel
         if (gameOverPanel != null)
             gameOverPanel.SetActive(true);
 
-        // Stop ghost completely
         if (navAgent != null)
             navAgent.isStopped = true;
-
-        // Optional: Freeze game
-        // Time.timeScale = 0f;
     }
-    // =============================
 
     void SetState(GhostState newState)
     {
